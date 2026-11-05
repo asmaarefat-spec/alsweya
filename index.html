@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>رحلة أبطال التفكر | مراجعة ليلة الامتحان - أكاديمية جيل</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Cairo & Tajawal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+            tajawal: ['Tajawal', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              teal: '#0d9488',
+              emerald: '#059669',
+              amber: '#f59e0b',
+              purple: '#7c3aed',
+              rose: '#f43f5e',
+              sky: '#0284c7'
+            }
+          },
+          keyframes: {
+            wiggle: {
+              '0%, 100%': { transform: 'rotate(-3deg)' },
+              '50%': { transform: 'rotate(3deg)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-8px)' },
+            }
+          },
+          animation: {
+            'wiggle': 'wiggle 1s ease-in-out infinite',
+            'float': 'float 3s ease-in-out infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Cairo', 'Tajawal', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      background-color: #f0fdfa;
+    }
+    
+    .card-shadow {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+    
+    .interactive-btn {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .interactive-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+    .interactive-btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    /* Print styling for Certificate */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #certificate-modal, #certificate-modal * {
+        visibility: visible;
+      }
+      #certificate-modal {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background: white !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col bg-gradient-to-b from-emerald-50 via-teal-50/40 to-sky-50">
+
+  <!-- ================= TOP HEADER / HUD ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b-2 border-teal-100 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      
+      <!-- Brand & Title -->
+      <button onclick="switchTab('home')" class="flex items-center gap-2.5 group cursor-pointer text-right focus:outline-none">
+        <div class="w-11 h-11 bg-gradient-to-tr from-teal-500 to-emerald-400 rounded-2xl flex items-center justify-center text-white text-2xl shadow-md group-hover:rotate-6 transition-transform">
+          🌟
+        </div>
+        <div>
+          <h1 class="text-base sm:text-xl font-black text-teal-800 leading-tight">رحلة أبطال التفكر</h1>
+          <p class="text-xs font-bold text-emerald-600">مراجعة ليلة الامتحان • أكاديمية جيل</p>
+        </div>
+      </button>
+
+      <!-- Player HUD -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Player Name -->
+        <button onclick="changePlayerName()" class="flex items-center gap-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 px-3 py-1.5 rounded-full border border-teal-200 text-xs sm:text-sm font-bold transition">
+          <i class="fa-solid fa-user-astronaut text-teal-600"></i>
+          <span id="player-display-name">البطل الذكي</span>
+          <i class="fa-solid fa-pen text-[10px] text-teal-400"></i>
+        </button>
+
+        <!-- Stars Counter -->
+        <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full shadow-inner">
+          <i class="fa-solid fa-star text-amber-500 text-base animate-pulse"></i>
+          <span id="stars-count" class="font-black text-amber-800 text-sm sm:text-base">0</span>
+        </div>
+
+        <!-- Sound Toggle -->
+        <button id="sound-btn" onclick="toggleSound()" title="تشغيل / كتم الصوت" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm transition">
+          <i id="sound-icon" class="fa-solid fa-volume-high text-teal-600"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="max-w-6xl mx-auto px-2 sm:px-4 py-2 flex items-center gap-1 sm:gap-2 overflow-x-auto text-xs sm:text-sm font-bold no-scrollbar">
+      <button onclick="switchTab('home')" class="nav-btn px-3 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap bg-teal-600 text-white shadow-sm" data-tab="home">
+        <i class="fa-solid fa-compass"></i> الخريطة
+      </button>
+      <button onclick="switchTab('capsule')" class="nav-btn px-3 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap bg-white text-slate-700 hover:bg-teal-50" data-tab="capsule">
+        <i class="fa-solid fa-bolt text-amber-500"></i> 1. كبسولة الامتحان
+      </button>
+      <button onclick="startSortingGame()" class="nav-btn px-3 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap bg-white text-slate-700 hover:bg-teal-50" data-tab="sorting">
+        <i class="fa-solid fa-arrows-split-up-and-left text-teal-600"></i> 2. لعبة الفرز والفرسان
+      </button>
+      <button onclick="startRiddlesGame()" class="nav-btn px-3 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap bg-white text-slate-700 hover:bg-teal-50" data-tab="riddles">
+        <i class="fa-solid fa-puzzle-piece text-emerald-600"></i> 3. حزازير "مَن أنا؟"
+      </button>
+      <button onclick="startExamSimulator()" class="nav-btn px-3 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap bg-white text-slate-700 hover:bg-teal-50" data-tab="exam">
+        <i class="fa-solid fa-award text-purple-600"></i> 4. اختبار ليلة الامتحان
+      </button>
+    </nav>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+
+    <!-- 0. HOME / HUB -->
+    <section id="tab-home" class="space-y-6">
+      
+      <!-- Welcome Hero -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-teal-600 via-teal-700 to-emerald-700 text-white p-6 sm:p-8 card-shadow">
+        <div class="relative z-10 max-w-2xl space-y-3">
+          <span class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3.5 py-1 rounded-full text-xs sm:text-sm font-bold text-amber-200">
+            ✨ الوحدة الثانية: التفكر ونعمة العقل (السوية الأولى)
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight">مستعد يا بطل لتفوق ليلة الامتحان؟ 🚀</h2>
+          <p class="text-teal-100 text-xs sm:text-base leading-relaxed">
+            العب وراجع أهم نقاط الدروس الثلاثة (سيدنا موسى والسحرة، رحلة التفكر في النفس والكون، وعظمة الخالق المدبر ودليل الصانع) واحصل على وسام التفوق!
+          </p>
+          <div class="pt-2 flex flex-wrap gap-2.5">
+            <button onclick="switchTab('capsule')" class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black px-4 sm:px-5 py-2.5 rounded-xl shadow-md interactive-btn text-xs sm:text-sm flex items-center gap-2">
+              <i class="fa-solid fa-book-open-reader"></i> مراجعة الكبسولة السريعة (3 د)
+            </button>
+            <button onclick="startSortingGame()" class="bg-white/20 hover:bg-white/30 text-white font-bold px-4 sm:px-5 py-2.5 rounded-xl border border-white/30 text-xs sm:text-sm interactive-btn">
+              ابدأ الألعاب التفاعلية 🎮
+            </button>
+          </div>
+        </div>
+        <div class="absolute -bottom-8 -left-6 text-white/10 text-9xl pointer-events-none select-none">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+      </div>
+
+      <!-- Quick Stations Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Station 1 -->
+        <div onclick="switchTab('capsule')" class="bg-white rounded-3xl p-5 border-2 border-teal-100 hover:border-teal-400 transition-all card-shadow cursor-pointer interactive-btn flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-2xl">
+              ⚡
+            </div>
+            <h3 class="font-black text-base text-slate-800">1. كبسولة الامتحان</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">أهم مفاتيح الدروس الثلاثة والآيات المقررة بطريقة ملخصة قبل النوم.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-teal-600 font-bold text-xs flex items-center justify-between">
+            <span>مراجعة سريعة</span>
+            <i class="fa-solid fa-arrow-left"></i>
+          </div>
+        </div>
+
+        <!-- Station 2 -->
+        <div onclick="startSortingGame()" class="bg-white rounded-3xl p-5 border-2 border-emerald-100 hover:border-emerald-400 transition-all card-shadow cursor-pointer interactive-btn flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl">
+              🎯
+            </div>
+            <h3 class="font-black text-base text-slate-800">2. لعبة الفرز السريع</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">فرز بطاقات أهل الحق والباطل، والتفكر في النفس والكون، والمخلوق والصانع.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-emerald-600 font-bold text-xs flex items-center justify-between">
+            <span>تحدي التصنيف</span>
+            <i class="fa-solid fa-arrow-left"></i>
+          </div>
+        </div>
+
+        <!-- Station 3 -->
+        <div onclick="startRiddlesGame()" class="bg-white rounded-3xl p-5 border-2 border-amber-100 hover:border-amber-400 transition-all card-shadow cursor-pointer interactive-btn flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl">
+              🔍
+            </div>
+            <h3 class="font-black text-base text-slate-800">3. حزازير مَن أنا؟</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">5 حزازير ذكية لاكتشاف آيات الله (القلب، الشمس، الهواء، المطر، عصا موسى).</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-amber-600 font-bold text-xs flex items-center justify-between">
+            <span>ألعاب ذكاء</span>
+            <i class="fa-solid fa-arrow-left"></i>
+          </div>
+        </div>
+
+        <!-- Station 4 -->
+        <div onclick="startExamSimulator()" class="bg-gradient-to-br from-purple-600 to-indigo-700 text-white rounded-3xl p-5 border-2 border-purple-300 transition-all card-shadow cursor-pointer interactive-btn flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 text-white flex items-center justify-center text-2xl">
+              🏆
+            </div>
+            <h3 class="font-black text-base">4. اختبار الامتحان</h3>
+            <p class="text-xs text-purple-100 leading-relaxed">10 أسئلة تحاكي الامتحان الفعلي للحصول على وسام التفكر والشهادة المعتمدة.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/20 text-amber-300 font-black text-xs flex items-center justify-between">
+            <span>شهادة تفوق</span>
+            <i class="fa-solid fa-arrow-left"></i>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- 1. CAPSULE SCREEN -->
+    <section id="tab-capsule" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 border-2 border-teal-200 card-shadow space-y-6">
+        
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-4 border-slate-100">
+          <div>
+            <span class="inline-block bg-teal-100 text-teal-800 text-xs font-black px-3 py-1 rounded-full mb-1">
+              مراجعة ليلة الامتحان المركزة 🌙
+            </span>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-800">كبسولة الدروس الثلاثة (احفظ وافهم)</h2>
+          </div>
+          <button onclick="startSortingGame()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl interactive-btn flex items-center gap-2">
+            ابدأ التحديات الآن <i class="fa-solid fa-arrow-left"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <!-- Lesson 1 Card -->
+          <div class="bg-teal-50/70 border-2 border-teal-200 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center gap-2 text-teal-900 font-black text-base border-b border-teal-200/60 pb-2">
+              <span class="text-xl">⚔️</span> 1. موسى والسحرة
+            </div>
+            <ul class="text-xs sm:text-sm text-slate-700 space-y-2 leading-relaxed">
+              <li>• <strong>الحق قوي:</strong> معجزة عصا موسى ابتلعت كل حبال السحرة لأن الحق يغلب الباطل.</li>
+              <li>• <strong>معية الله:</strong> ﴿لا تَخَفْ إِنَّكَ أَنتَ الأَعْلَى﴾؛ الله مع أوليائه بالحفظ والنصر.</li>
+              <li>• <strong>شجاعة السحرة:</strong> لما رأوا الحق سجدوا فوراً ولم يخافوا تهديد فرعون بالقتل والصلب.</li>
+              <li>• <strong>مفتاح النصر:</strong> الصبر والتوكل على الله ﴿رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا وَتَوَفَّنَا مُسْلِمِينَ﴾.</li>
+            </ul>
+          </div>
+
+          <!-- Lesson 2 Card -->
+          <div class="bg-emerald-50/70 border-2 border-emerald-200 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center gap-2 text-emerald-900 font-black text-base border-b border-emerald-200/60 pb-2">
+              <span class="text-xl">🔍</span> 2. رحلة في عالم التفكر
+            </div>
+            <ul class="text-xs sm:text-sm text-slate-700 space-y-2 leading-relaxed">
+              <li>• <strong>التفكر عبادة:</strong> إعمال العقل في خلق الله يزيد إيماننا وحبنا لله وشكرنا له.</li>
+              <li>• <strong>في النفس:</strong> القلب الذي ينبض دون توقف ونحن نيام، والعقل الذي نميز به، والرئتان للتنفس.</li>
+              <li>• <strong>في الكون:</strong> الشمس بمسارها الموزون، المطر الذي يحيي الأرض، والهواء الذي يملأ الفضاء.</li>
+              <li>• <strong>قول المؤمن:</strong> عند التفكر نقول: <em>"سُبْحَانَ اللَّهِ، مَا خَلَقْتَ هَذَا بَاطِلاً"</em>.</li>
+            </ul>
+          </div>
+
+          <!-- Lesson 3 Card -->
+          <div class="bg-amber-50/70 border-2 border-amber-200 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center gap-2 text-amber-900 font-black text-base border-b border-amber-200/60 pb-2">
+              <span class="text-xl">⚙️</span> 3. ربي خلق ودبّر
+            </div>
+            <ul class="text-xs sm:text-sm text-slate-700 space-y-2 leading-relaxed">
+              <li>• <strong>دليل الصانع (الساعة):</strong> كما أن الساعة المعقدة مستحيل أن تأتي صدفة، فالكون العظيم لابد له من خالق صانع حكيم.</li>
+              <li>• <strong>بطلان الصدفة:</strong> الدقة المذهلة في الكون تنفي الصدفة العشوائية تماماً.</li>
+              <li>• <strong>البرهان القرآني:</strong> ﴿أَمْ خُلِقُوا مِنْ غَيْرِ شَيْءٍ أَمْ هُمُ الْخَالِقُونَ﴾ [الطور].</li>
+              <li>• <strong>التوحيد:</strong> طالما أن الله وحده الخالق المدبر، فهو وحده المستحق للعبادة والطاعة.</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 text-amber-950 flex flex-col sm:flex-row items-center justify-between gap-3 font-bold text-xs sm:text-sm">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl sm:text-3xl">💡</span>
+            <span>القاعدة الذهبية: <strong>المؤمن الذكي يتفكر بعقله، فيزداد قلبه حباً لله ويقيناً بنصره!</strong></span>
+          </div>
+          <button onclick="startSortingGame()" class="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-black whitespace-nowrap shadow">
+            انتقل للعبة الفرز 🎯
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. SORTING GAME SCREEN -->
+    <section id="tab-sorting" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl p-5 sm:p-7 border-2 border-teal-200 card-shadow space-y-6">
+        
+        <div class="flex items-center justify-between border-b pb-4 border-slate-100">
+          <div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-black text-teal-700 bg-teal-100 px-3 py-1 rounded-full mb-1">
+              المحطة 2 • تحدي الفرز الذكي
+            </span>
+            <h2 class="text-lg sm:text-2xl font-black text-slate-800">صنّف البطاقة في الصندوق الصحيح 🎯</h2>
+          </div>
+          <div class="text-xs sm:text-sm font-black text-teal-700">
+            البطاقة: <span id="sort-card-index" class="text-lg text-teal-600">1</span> / <span id="sort-total-cards">6</span>
+          </div>
+        </div>
+
+        <!-- The Active Card to Sort -->
+        <div class="text-center py-4">
+          <div id="sorting-active-card" class="inline-block max-w-md w-full bg-gradient-to-br from-amber-50 to-orange-50 border-3 border-amber-300 rounded-3xl p-6 text-slate-800 shadow-md transform transition duration-300">
+            <div id="sorting-card-icon" class="text-4xl mb-2">⭐</div>
+            <div id="sorting-card-title" class="text-base sm:text-lg font-black leading-snug">تحميل البطاقة...</div>
+            <div id="sorting-card-hint" class="text-xs text-slate-500 mt-1 font-semibold">اضغط على الصندوق المناسب لها بالأسفل</div>
+          </div>
+        </div>
+
+        <!-- Target Bins -->
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-xl mx-auto" id="sorting-bins-container">
+          <!-- Injected via JS -->
+        </div>
+
+        <!-- Feedback & Footer -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+          <button onclick="switchTab('home')" class="text-xs font-bold text-slate-500 hover:text-slate-800">
+            <i class="fa-solid fa-arrow-right"></i> العودة للخريطة
+          </button>
+          <div id="sort-feedback" class="text-xs sm:text-sm font-bold text-slate-700"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. RIDDLES GAME SCREEN ("من أنا؟") -->
+    <section id="tab-riddles" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl p-5 sm:p-7 border-2 border-emerald-200 card-shadow space-y-6">
+        
+        <div class="flex items-center justify-between border-b pb-4 border-slate-100">
+          <div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-black text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full mb-1">
+              المحطة 3 • كشف الأسرار
+            </span>
+            <h2 class="text-lg sm:text-2xl font-black text-slate-800">حزازير آيات الله: مَن أنا؟ 🔍</h2>
+          </div>
+          <div class="text-xs sm:text-sm font-black text-emerald-700">
+            اللغز: <span id="riddle-step-txt" class="text-lg text-emerald-600">1</span> / 5
+          </div>
+        </div>
+
+        <!-- Riddle Question Container -->
+        <div id="riddle-container" class="min-h-[280px] flex flex-col justify-center">
+          <!-- Injected via JS -->
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+          <button onclick="switchTab('home')" class="text-xs font-bold text-slate-500 hover:text-slate-800">
+            <i class="fa-solid fa-arrow-right"></i> العودة للخريطة
+          </button>
+          <div id="riddle-feedback" class="text-xs sm:text-sm font-bold"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. EXAM SIMULATOR SCREEN -->
+    <section id="tab-exam" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl p-5 sm:p-8 border-2 border-purple-200 card-shadow space-y-6">
+        
+        <div class="flex items-center justify-between border-b pb-4 border-slate-100">
+          <div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-black text-purple-700 bg-purple-100 px-3 py-1 rounded-full mb-1">
+              المحطة 4 • المحاكي النهائي
+            </span>
+            <h2 class="text-lg sm:text-2xl font-black text-purple-900">اختبار ليلة الامتحان الشامل 📝</h2>
+          </div>
+          <div class="text-left">
+            <div class="text-xs font-bold text-slate-500">الدرجة الحالية</div>
+            <div class="text-lg font-black text-purple-700"><span id="exam-live-score">0</span> / 10</div>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+          <div id="exam-progress-bar" class="bg-gradient-to-r from-purple-500 to-indigo-600 h-full transition-all duration-300" style="width: 10%;"></div>
+        </div>
+
+        <!-- Exam Container -->
+        <div id="exam-card-container" class="min-h-[300px] flex flex-col justify-center">
+          <!-- Injected via JS -->
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+          <span class="text-xs font-semibold text-slate-500" id="exam-question-number">السؤال 1 من 10</span>
+          <div id="exam-feedback-msg" class="text-xs sm:text-sm font-bold"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. CERTIFICATE MODAL -->
+    <div id="certificate-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm p-4 flex items-center justify-center overflow-y-auto">
+      <div class="bg-white max-w-2xl w-full rounded-3xl p-6 sm:p-8 card-shadow border-4 border-amber-300 relative text-center space-y-5 animate-pulse-subtle">
+        
+        <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 flex items-center justify-center text-amber-900 text-4xl shadow-lg border-4 border-white -mt-14 sm:-mt-16">
+          🏆
+        </div>
+
+        <div class="space-y-1">
+          <span class="text-xs font-black tracking-wider text-emerald-700 bg-emerald-50 px-3.5 py-1 rounded-full border border-emerald-200">
+            أكاديمية جيل • السوية الأولى
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-black text-slate-800">شهادة تفوق: وسام بطل التفكر الذهبي</h2>
+          <p class="text-slate-500 text-xs sm:text-sm">يُمنح هذا الوسام تقديراً للتميز والإتقان للبطل المبدع:</p>
+        </div>
+
+        <div class="py-2">
+          <div id="cert-child-name" class="inline-block text-2xl sm:text-3xl font-black text-teal-800 border-b-2 border-dashed border-teal-500 pb-1 px-8">
+            البطل الذكي
+          </div>
+        </div>
+
+        <p class="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto">
+          قد أتم بنجاح وتفوق مراجعة <strong>الوحدة الثانية: التفكر ونعمة العقل</strong>، وأظهر فهماً عميقاً لثبات الحق وقصة موسى والسحرة، ودلائل عظمة الخالق في الكون والأنفس، وبرهان الصانع الحكيم.
+        </p>
+
+        <!-- Grade Display -->
+        <div class="inline-flex items-center gap-3 bg-amber-50 border border-amber-200 px-6 py-2.5 rounded-2xl">
+          <div class="text-right">
+            <div class="text-xs text-amber-800 font-bold">الدرجة في محاكي الامتحان</div>
+            <div class="text-2xl font-black text-amber-600" id="cert-score-display">10 / 10</div>
+          </div>
+          <div class="text-3xl">⭐</div>
+        </div>
+
+        <div class="flex justify-between items-center text-xs font-bold text-slate-400 pt-3 border-t border-slate-100 px-4">
+          <div>التاريخ: ليلة الامتحان المباركة ✨</div>
+          <div>التوقيع: أكاديمية جيل للتعليم المتميز 🌟</div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="pt-3 flex flex-wrap items-center justify-center gap-2.5 no-print">
+          <button onclick="window.print()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 rounded-xl shadow interactive-btn text-xs sm:text-sm flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> طباعة / حفظ الشهادة PDF
+          </button>
+          <button onclick="startExamSimulator()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-xl interactive-btn text-xs sm:text-sm">
+            إعادة الاختبار 🔄
+          </button>
+          <button onclick="closeCertificate()" class="bg-amber-400 hover:bg-amber-500 text-amber-950 font-black px-5 py-2.5 rounded-xl interactive-btn text-xs sm:text-sm">
+            العودة للرئيسية 🏠
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-8 bg-white border-t border-teal-100 py-3 text-center text-xs text-slate-500">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="font-bold text-teal-800">
+        🌱 رفيقة طفلك في التفكر والإيمان - مستوحى من منهاج أكاديمية جيل
+      </div>
+      <div>
+        ﴿ قُلِ انظُرُوا مَاذَا فِي السَّمَاوَاتِ وَالأَرْضِ ﴾
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* ----------------------------------------------------
+       1. WEB AUDIO API SYNTHESIZER (NO EXTERNAL AUDIO FILES)
+       ---------------------------------------------------- */
+    class ChildAudio {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playClick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      }
+
+      playCorrect() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        // Joyful chord (C - E - G - High C)
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+          gain.gain.setValueAtTime(0.15, now + idx * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.22);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.07);
+          osc.stop(now + idx * 0.07 + 0.22);
+        });
+      }
+
+      playWrong() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.linearRampToValueAtTime(140, now + 0.22);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.22);
+      }
+
+      playFanfare() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const fanfare = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+        fanfare.forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.09);
+          gain.gain.setValueAtTime(0.2, now + i * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.45);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.09);
+          osc.stop(now + i * 0.09 + 0.45);
+        });
+      }
+    }
+
+    const sfx = new ChildAudio();
+
+    function toggleSound() {
+      sfx.enabled = !sfx.enabled;
+      const icon = document.getElementById('sound-icon');
+      if (sfx.enabled) {
+        icon.className = 'fa-solid fa-volume-high text-teal-600';
+        sfx.playClick();
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+      }
+    }
+
+    /* ----------------------------------------------------
+       2. STATE & USER PROFILE
+       ---------------------------------------------------- */
+    const appState = {
+      playerName: 'بطل التفكر الذكي',
+      stars: 0,
+      sortIndex: 0,
+      riddleIndex: 0,
+      examIndex: 0,
+      examScore: 0
+    };
+
+    function addStars(count) {
+      appState.stars += count;
+      document.getElementById('stars-count').innerText = appState.stars;
+      try {
+        confetti({
+          particleCount: 20,
+          spread: 50,
+          origin: { y: 0.2 }
+        });
+      } catch (e) {}
+    }
+
+    function changePlayerName() {
+      const name = prompt('اكتب اسمك يا بطل ليظهر في شهادة التفوق:', appState.playerName);
+      if (name && name.trim()) {
+        appState.playerName = name.trim();
+        document.getElementById('player-display-name').innerText = appState.playerName;
+        document.getElementById('cert-child-name').innerText = appState.playerName;
+      }
+    }
+
+    /* ----------------------------------------------------
+       3. NAVIGATION
+       ---------------------------------------------------- */
+    function switchTab(tabId) {
+      sfx.playClick();
+      const tabs = ['home', 'capsule', 'sorting', 'riddles', 'exam'];
+      tabs.forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        if (el) el.classList.add('hidden');
+      });
+
+      const activeEl = document.getElementById(`tab-${tabId}`);
+      if (activeEl) activeEl.classList.remove('hidden');
+
+      // Update Nav active styling
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.className = 'nav-btn px-3 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap bg-teal-600 text-white shadow-sm font-bold text-xs sm:text-sm';
+        } else {
+          btn.className = 'nav-btn px-3 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap bg-white text-slate-700 hover:bg-teal-50 font-bold text-xs sm:text-sm';
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ----------------------------------------------------
+       4. GAME 1: SORTING CARDS (6 Diverse Cards)
+       ---------------------------------------------------- */
+    const sortingCards = [
+      {
+        icon: '🛡️',
+        title: 'السجود لله فور ظهور الحق والصبر على تهديد فرعون',
+        targetBin: 'truth',
+        bins: [
+          { id: 'truth', label: 'طريق أهل الحق 🌟', color: 'teal' },
+          { id: 'falsehood', label: 'طريق أهل الباطل ⚡', color: 'rose' }
+        ],
+        hint: 'من صفات السحرة بعدما آمنوا برب موسى وهارون.'
+      },
+      {
+        icon: '🦹',
+        title: 'التكبر والتهديد بالصلب والتعذيب واستخدام السحر والخداع',
+        targetBin: 'falsehood',
+        bins: [
+          { id: 'truth', label: 'طريق أهل الحق 🌟', color: 'teal' },
+          { id: 'falsehood', label: 'طريق أهل الباطل ⚡', color: 'rose' }
+        ],
+        hint: 'من صفات فرعون والظالمين.'
+      },
+      {
+        icon: '🫀',
+        title: 'نبضات القلب التي لا تتوقف ونحن نيام والعقل المفكر',
+        targetBin: 'self',
+        bins: [
+          { id: 'self', label: 'التفكر في النفس 🧠', color: 'purple' },
+          { id: 'universe', label: 'التفكر في الكون 🌌', color: 'sky' }
+        ],
+        hint: 'داخل جسدك وأعضائك العجيبة.'
+      },
+      {
+        icon: '🌧️',
+        title: 'نزول المطر لإحياء الأرض ومسار الشمس المحسوب بالدقة',
+        targetBin: 'universe',
+        bins: [
+          { id: 'self', label: 'التفكر في النفس 🧠', color: 'purple' },
+          { id: 'universe', label: 'التفكر في الكون 🌌', color: 'sky' }
+        ],
+        hint: 'في السماء والطبيعة الواسعة.'
+      },
+      {
+        icon: '⌚',
+        title: 'ساعة يد دقيقة بعقارب وبطارية ترشدنا للوقت',
+        targetBin: 'human',
+        bins: [
+          { id: 'human', label: 'صنع الإنسان المبتكر 🛠️', color: 'amber' },
+          { id: 'allah', label: 'خلق الله العظيم وحده 🌿', color: 'emerald' }
+        ],
+        hint: 'صنعها إنسان ذكي ومستحيل أن تتجمع صدفة.'
+      },
+      {
+        icon: '🦅',
+        title: 'عين الصقر الحادة وجناحه الذي يطير به في الهواء',
+        targetBin: 'allah',
+        bins: [
+          { id: 'human', label: 'صنع الإنسان المبتكر 🛠️', color: 'amber' },
+          { id: 'allah', label: 'خلق الله العظيم وحده 🌿', color: 'emerald' }
+        ],
+        hint: 'من إبداع الله الخالق البارئ المصور.'
+      }
+    ];
+
+    function startSortingGame() {
+      appState.sortIndex = 0;
+      switchTab('sorting');
+      renderSortingCard();
+    }
+
+    function renderSortingCard() {
+      const total = sortingCards.length;
+      document.getElementById('sort-total-cards').innerText = total;
+      document.getElementById('sort-card-index').innerText = Math.min(appState.sortIndex + 1, total);
+      document.getElementById('sort-feedback').innerText = '';
+
+      if (appState.sortIndex >= total) {
+        // Complete
+        sfx.playFanfare();
+        document.getElementById('sorting-active-card').innerHTML = `
+          <div class="space-y-3 py-4">
+            <div class="text-5xl">🎉</div>
+            <div class="text-xl font-black text-teal-800">أحسنت يا بطل التصنيف!</div>
+            <p class="text-xs text-slate-600">فرزت جميع البطاقات بدقة وفهمت الفرق بين الحق والباطل ومخلوقات الله وصنع الإنسان.</p>
+            <button onclick="startRiddlesGame()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-5 py-2.5 rounded-xl interactive-btn text-xs sm:text-sm shadow">
+              المحطة التالية: حزازير "مَن أنا؟" 🔍
+            </button>
+          </div>
+        `;
+        document.getElementById('sorting-bins-container').innerHTML = '';
+        return;
+      }
+
+      const card = sortingCards[appState.sortIndex];
+      document.getElementById('sorting-card-icon').innerText = card.icon;
+      document.getElementById('sorting-card-title').innerText = card.title;
+      document.getElementById('sorting-card-hint').innerText = card.hint;
+
+      // Render the 2 bins for this specific card
+      const binsContainer = document.getElementById('sorting-bins-container');
+      binsContainer.innerHTML = card.bins.map(bin => `
+        <button onclick="chooseSortingBin('${bin.id}')" class="p-4 sm:p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 bg-white font-black text-xs sm:text-sm text-slate-800 interactive-btn shadow-sm flex flex-col items-center justify-center gap-1.5">
+          <span>${bin.label}</span>
+          <span class="text-[11px] font-bold text-slate-400">اضغط للاختيار</span>
+        </button>
+      `).join('');
+    }
+
+    function chooseSortingBin(binId) {
+      const current = sortingCards[appState.sortIndex];
+      const feedback = document.getElementById('sort-feedback');
+
+      if (binId === current.targetBin) {
+        sfx.playCorrect();
+        feedback.innerHTML = '<span class="text-emerald-600 font-black">تصنيف رائع وصحيح 100%! ⭐</span>';
+        addStars(1);
+        setTimeout(() => {
+          appState.sortIndex++;
+          renderSortingCard();
+        }, 1100);
+      } else {
+        sfx.playWrong();
+        feedback.innerHTML = '<span class="text-rose-600 font-black">حاول مجدداً بتركيز يا بطل! اقرأ التلميح جيداً.</span>';
+      }
+    }
+
+    /* ----------------------------------------------------
+       5. GAME 2: RIDDLES ("مَن أنا؟" 5 Riddles)
+       ---------------------------------------------------- */
+    const riddlesData = [
+      {
+        riddle: 'أنا مضخة عجيبة في صدرك بحجم قبضة يدك، أنبض ليلاً ونهاراً دون توقف لتوزيع الدم والأكسجين حتى أثناء نومك.. فمَن أنا؟',
+        options: [
+          { text: 'القلب 🫀', correct: true },
+          { text: 'العين 👀', correct: false },
+          { text: 'المعدة 🥣', correct: false }
+        ],
+        lesson: 'سبحان الله! القلب آية كبرى في أنفسنا تدعونا لشكر الله دائماً.'
+      },
+      {
+        riddle: 'أنا مصباح السماء الهائل، أمد الأرض بالدفء والنور، وأدور بمسار دقيق جداً لو اقتربت لاحترقتم ولو ابتعدت لتجمدتم.. فمَن أنا؟',
+        options: [
+          { text: 'القمر 🌙', correct: false },
+          { text: 'الشمس ☀️', correct: true },
+          { text: 'النجم الصغير ✨', correct: false }
+        ],
+        lesson: 'موقع الشمس المحسوب بدقة هو دليل التدبير الإلهي المحكم.'
+      },
+      {
+        riddle: 'لا تستطيع أن تراني بعينك، لكنك تشعر بي حين أحرّك أوراق الأشجار، وتستنشقني كل ثانية لتعيش وبدوني تختنق الكائنات.. فمَن أنا؟',
+        options: [
+          { text: 'الهواء والأكسجين 💨', correct: true },
+          { text: 'الماء 💧', correct: false },
+          { text: 'الضوء 💡', correct: false }
+        ],
+        lesson: 'الهواء نعمة عظيمة غير مرئية سخرها الله لكل حي بالمجان.'
+      },
+      {
+        riddle: 'أنزل من السحاب قطرات عذبة مباركة، أحيي الأرض العطشى لتخرج الزروع والثمار ويشرب الناس والأنعام.. فمَن أنا؟',
+        options: [
+          { text: 'المطر والماء 🌧️', correct: true },
+          { text: 'الغبار 🌪️', correct: false },
+          { text: 'الرمال 🏖️', correct: false }
+        ],
+        lesson: '﴿وَأَنزَلْنَا مِنَ السَّمَاءِ مَاءً بِقَدَرٍ﴾ المطر برهان رحمة الله وإحيائه الموتى.'
+      },
+      {
+        riddle: 'كنت خشبية في يد نبي الله موسى، أتحول بأمر الله إلى ثعبان حقيقي عظيم ألقف وأبتلع سحر السحرة وحبالهم.. فمَن أنا؟',
+        options: [
+          { text: 'عصا موسى عليه السلام 🪄', correct: true },
+          { text: 'سفينة نوح 🚢', correct: false },
+          { text: 'حبل الساحر 🪢', correct: false }
+        ],
+        lesson: 'معجزة عصا موسى أثبتت أن الحق من عند الله ينتصر على كل باطل.'
+      }
+    ];
+
+    function startRiddlesGame() {
+      appState.riddleIndex = 0;
+      switchTab('riddles');
+      renderRiddle();
+    }
+
+    function renderRiddle() {
+      const total = riddlesData.length;
+      document.getElementById('riddle-step-txt').innerText = Math.min(appState.riddleIndex + 1, total);
+      document.getElementById('riddle-feedback').innerText = '';
+
+      const container = document.getElementById('riddle-container');
+
+      if (appState.riddleIndex >= total) {
+        sfx.playFanfare();
+        container.innerHTML = `
+          <div class="text-center py-6 space-y-4">
+            <div class="text-5xl">🌟</div>
+            <h3 class="text-xl font-black text-emerald-800">عبقري الآيات والتفكر!</h3>
+            <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
+              حللت الحزازير الخمسة بنجاح وعرفت دلائل قدرة الله في نفسك والكون وقصص أنبيائه.
+            </p>
+            <div class="pt-2">
+              <button onclick="startExamSimulator()" class="bg-purple-600 hover:bg-purple-700 text-white font-black px-6 py-2.5 rounded-xl interactive-btn text-xs sm:text-sm shadow">
+                الانتقال لاختبار ليلة الامتحان النهائي 🏆
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const item = riddlesData[appState.riddleIndex];
+
+      container.innerHTML = `
+        <div class="space-y-5">
+          <div class="bg-emerald-50/80 border-2 border-emerald-300 rounded-3xl p-5 sm:p-6 text-emerald-950 font-bold text-sm sm:text-base leading-relaxed text-center shadow-sm">
+            "${item.riddle}"
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            ${item.options.map((opt, i) => `
+              <button onclick="checkRiddleAnswer(${i})" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 bg-white font-black text-xs sm:text-sm text-slate-800 interactive-btn shadow-sm flex items-center justify-center">
+                <span>${opt.text}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function checkRiddleAnswer(idx) {
+      const current = riddlesData[appState.riddleIndex];
+      const opt = current.options[idx];
+      const feedback = document.getElementById('riddle-feedback');
+
+      if (opt.correct) {
+        sfx.playCorrect();
+        feedback.innerHTML = `<span class="text-emerald-600 font-black">أحسنت! ${current.lesson} ⭐</span>`;
+        addStars(1);
+        setTimeout(() => {
+          appState.riddleIndex++;
+          renderRiddle();
+        }, 1400);
+      } else {
+        sfx.playWrong();
+        feedback.innerHTML = '<span class="text-rose-600 font-black">فكر في صفات الحزورة مجدداً يا بطل!</span>';
+      }
+    }
+
+    /* ----------------------------------------------------
+       6. GAME 3: EXAM SIMULATOR (10 Questions)
+       ---------------------------------------------------- */
+    const examQuestions = [
+      {
+        question: 'ماذا حدث لعصا سيدنا موسى عليه السلام عندما ألقاها أمام السحرة بأمر الله؟',
+        options: ['تحولت إلى ثعبان حقيقي ابتلع حبالهم وعصيهم', 'اختفت وطارت في الهواء', 'تحولت إلى ذهب'],
+        correct: 0,
+        explanation: 'عصا موسى كانت معجزة حقيقية من الله أذهلت السحرة وغلبت باطلهم.'
+      },
+      {
+        question: 'سجد السحرة وآمنوا بالله فوراً لأنهم أهل علم بالسحر وعرفوا أن ما فعله موسى معجزة ربانية.',
+        options: ['صح', 'خطأ'],
+        correct: 0,
+        explanation: 'صحيح! خضع السحرة للحق فوراً ولم يترددوا.'
+      },
+      {
+        question: 'من القائل لفرعون بثبات وإيمان: ﴿رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا وَتَوَفَّنَا مُسْلِمِينَ﴾؟',
+        options: ['السحرة بعد أن آمنوا برب موسى وهارون', 'جنود فرعون الظالمون', 'قارون'],
+        correct: 0,
+        explanation: 'السحرة المؤمنون ثبتوا على إيمانهم وطلبوا من الله الصبر والوفاة على الإسلام.'
+      },
+      {
+        question: 'التفكر هو إعمال العقل في خلق الله وهو عبادة عظيمة تقود لمحبة الله وشكره.',
+        options: ['صح', 'خطأ'],
+        correct: 0,
+        explanation: 'صحيح! التفكر عبادة يتقرب بها المسلم لربه ليزداد إيمانه.'
+      },
+      {
+        question: 'أي من الأمثلة التالية يُعد تفكراً في "النفس" كما تعلمت في رحلة سلمى وعمر؟',
+        options: ['نبضات القلب وعمل الرئتين في الصدر', 'حركة السحاب والمطر في السماء', 'أمواج البحر الواسع'],
+        correct: 0,
+        explanation: 'أعضاء جسمك كالقلب والعقل هي آيات الله في نفسك.'
+      },
+      {
+        question: 'المؤمن الصادق يخاف من تهديد الظالمين أكثر من خوفه من الله سبحانه وتعالى.',
+        options: ['صح', 'خطأ'],
+        correct: 1,
+        explanation: 'خطأ! المؤمن لا يخاف إلا الله، لأن معية الله تحفظه ﴿لا تَخَفْ إِنَّكَ أَنتَ الأَعْلَى﴾.'
+      },
+      {
+        question: 'إذا رأينا ساعة يد دقيقة الصنع مصنوعة من تروس وعقارب، فماذا يحكم عقلنا؟',
+        options: ['لها صانع حكيم وماهر صممها', 'تجمعت حبات الرمل صدفة فصارت ساعة', 'تكونت وحدها بلا سبب'],
+        correct: 0,
+        explanation: 'دليل الصانع: كل صنع متقن يدل يقيناً على صانع حكيم، فالكون أولى بالخالق العظيم.'
+      },
+      {
+        question: '﴿أَمْ خُلِقُوا مِنْ غَيْرِ شَيْءٍ أَمْ هُمُ الْخَالِقُونَ﴾ نزلت هذه الآية الكريمة كبرهان عقلي في سورة:',
+        options: ['سورة الطور', 'سورة الفلق', 'سورة الإخلاص'],
+        correct: 0,
+        explanation: 'الآية في سورة الطور وهي حجة قاطعة على استحالة وجود الخلق بلا خالق.'
+      },
+      {
+        question: 'انتظام مسار الشمس والمسافة المحسوبة بينها وبين الأرض دليل على:',
+        options: ['التدبير الإلهي المتقن والحكمة العظيمة', 'الصدفة العمياء العشوائية', 'أن الكواكب تتصادم بلا نظام'],
+        correct: 0,
+        explanation: 'كل كوكب وشمس يتحرك بحساب وتدبير دقيق من الله الرحيم.'
+      },
+      {
+        question: 'ما هي الثمرة العظمى التي نصل إليها عندما نعلم أن الله وحده هو الخالق المدبر؟',
+        options: ['إفراده بالعبادة والطاعة والمحبة وحده لا شريك له', 'الكسل وترك الصلاة', 'الغرور بقوة الإنسان'],
+        correct: 0,
+        explanation: 'التوحيد الخالص هو الغاية: الخالق المدبر وحده هو المستحق للعبادة والشكر.'
+      }
+    ];
+
+    function startExamSimulator() {
+      appState.examIndex = 0;
+      appState.examScore = 0;
+      switchTab('exam');
+      renderExamCard();
+    }
+
+    function renderExamCard() {
+      const total = examQuestions.length;
+      document.getElementById('exam-live-score').innerText = appState.examScore;
+      document.getElementById('exam-question-number').innerText = `السؤال ${Math.min(appState.examIndex + 1, total)} من ${total}`;
+      document.getElementById('exam-progress-bar').style.width = `${((appState.examIndex + 1) / total) * 100}%`;
+      document.getElementById('exam-feedback-msg').innerText = '';
+
+      if (appState.examIndex >= total) {
+        showCertificate();
+        return;
+      }
+
+      const q = examQuestions[appState.examIndex];
+      const container = document.getElementById('exam-card-container');
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="bg-purple-50/80 border-2 border-purple-200 rounded-3xl p-5 sm:p-6 text-purple-950 font-black text-sm sm:text-lg text-center shadow-sm">
+            ${q.question}
+          </div>
+
+          <div class="grid grid-cols-1 gap-2.5 max-w-xl mx-auto" id="exam-choices-box">
+            ${q.options.map((opt, i) => `
+              <button onclick="handleExamChoice(${i})" class="w-full text-right p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200 hover:border-purple-500 bg-white text-slate-800 font-bold text-xs sm:text-base interactive-btn shadow-sm flex items-center justify-between">
+                <span>${opt}</span>
+                <i class="fa-regular fa-circle-check text-slate-300"></i>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleExamChoice(choiceIndex) {
+      const q = examQuestions[appState.examIndex];
+      const isCorrect = (choiceIndex === q.correct);
+      const feedback = document.getElementById('exam-feedback-msg');
+
+      // Disable choices
+      const btns = document.querySelectorAll('#exam-choices-box button');
+      btns.forEach(b => b.disabled = true);
+
+      if (isCorrect) {
+        sfx.playCorrect();
+        appState.examScore++;
+        document.getElementById('exam-live-score').innerText = appState.examScore;
+        feedback.innerHTML = '<span class="text-emerald-600 font-black">إجابة نموذجية ممتازة! ⭐</span>';
+        addStars(1);
+      } else {
+        sfx.playWrong();
+        feedback.innerHTML = `<span class="text-rose-600 font-bold">تذكر: ${q.explanation}</span>`;
+      }
+
+      setTimeout(() => {
+        appState.examIndex++;
+        renderExamCard();
+      }, 1500);
+    }
+
+    /* ----------------------------------------------------
+       7. CERTIFICATE MODAL
+       ---------------------------------------------------- */
+    function showCertificate() {
+      sfx.playFanfare();
+      document.getElementById('cert-child-name').innerText = appState.playerName;
+      document.getElementById('cert-score-display').innerText = `${appState.examScore} / 10`;
+      document.getElementById('certificate-modal').classList.remove('hidden');
+
+      try {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.4 }
+        });
+      } catch (e) {}
+    }
+
+    function closeCertificate() {
+      document.getElementById('certificate-modal').classList.add('hidden');
+      switchTab('home');
+    }
+
+    /* ----------------------------------------------------
+       8. INITIALIZATION
+       ---------------------------------------------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      document.body.addEventListener('click', () => {
+        sfx.init();
+      }, { once: true });
+    });
+  </script>
+</body>
+</html>
